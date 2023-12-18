@@ -1,12 +1,13 @@
 import React from 'react'
-import {useAuth0} from '@auth0/auth0-react'
+import './LandingPage.css'
+
+
 
 const LandingPage = () => {
-  
-  return (
-    <div>Esta es la pagina de bienvenida landing
 
-     
+  return (
+    <div className="landing-page">
+      <h1>Bienvenidos al sitio de proformas</h1>
     </div>
   )
 }
