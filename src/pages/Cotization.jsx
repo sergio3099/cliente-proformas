@@ -15,7 +15,7 @@ import AddressForm from '../pages/DataPrice';
 import PaymentForm from '../pages/PaymenForm';
 import Review from '../pages/Review';
 import AddIcon from '@mui/icons-material/Add';
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 
 
@@ -24,7 +24,7 @@ function Copyright() {
     <Typography variant="body2" color="text.secondary" align="center">
       {'Copyright © '}
       <Link color="inherit" href="https://github.com/sergio3099">
-        Código Fuente   
+        Código Fuente
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -34,32 +34,81 @@ function Copyright() {
 
 const steps = ['Datos Cliente', 'Producto', 'Detalles Cotización'];
 
-function getStepContent(step) {
-  switch (step) {
-    case 0:
-      return <AddressForm />;
-    case 1:
-      return <PaymentForm />;
-    case 2:
-      return <Review />;
-    default:
-      throw new Error('Unknown step');
-  }
-}
 
 const theme = createTheme();
 
 export default function Checkout() {
   const [activeStep, setActiveStep] = React.useState(0);
 
+  const [formData, setFormData] = React.useState({
+    // Aquí agrega todos los campos de los formularios
+    nombre: '',
+    apellido: '',
+    direccion: '',
+    referencia: '',
+    celular: '',
+    selectedProduct: null,
+    selectedVidrio: null,
+    selectedAluminio: null,
+    alto: '',
+    ancho: '',
+    grosorVidrio: '',
+    // Otros campos si los hay
+  });
+
   const handleNext = () => {
-    setActiveStep(activeStep + 1);
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
   const handleBack = () => {
-    setActiveStep(activeStep - 1);
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
+
+  const getStepContent = (step) => {
+    switch (step) {
+      case 0:
+        return (
+          <AddressForm formData={formData} setFormData={setFormData} />
+        );
+      case 1:
+        return (
+          <PaymentForm formData={formData} setFormData={setFormData} />
+        );
+      case 2:
+        return (
+          <Review formData={formData} />
+        );
+      default:
+        throw new Error('Unknown step');
+    }
+  };
+
   const navigate = useNavigate();
+  const [loading, setLoading] = React.useState(false);
+
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('https://backend-proformas.onrender.com/v1/softwareproformas/api/proformas', {
+        method: 'POST',
+        body: JSON.stringify(formData),
+        headers: {'Content-Type': 'application/json'}
+      });
+
+      if (response.ok) {
+        alert('Se ha guardado con éxito');
+        navigate('/home');
+      } else {
+        alert('Hubo un problema al guardar la cotización');
+      }
+    } catch (error) {
+      console.error('Ocurrió un error al procesar la solicitud:', error);
+      alert('Ocurrió un error al procesar la solicitud');
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -79,17 +128,19 @@ export default function Checkout() {
           <Typography component="h1" variant="h4" align="center">
             Cotización
           </Typography>
-          <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
+          <form onSubmit={handleSubmit}>
+            <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+          </form>
           {activeStep === steps.length ? (
             <React.Fragment>
               <Typography variant="h5" gutterBottom>
-                Thank you for your order.
+                Gracias por su cotización.
               </Typography>
               <Typography variant="subtitle1">
                 Su cotizacion ha sido guardada exitosamente
@@ -109,18 +160,19 @@ export default function Checkout() {
             <React.Fragment>
               {getStepContent(activeStep)}
               <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                {activeStep !== 0 && (
-                  <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>
-                    Atrás
-                  </Button>
-                )}
+                {/* Botones para navegar entre los pasos */}
+                <Button disabled={activeStep === 0} onClick={handleBack}>
+                  Atrás
+                </Button>
+                <Button type='submit' variant="contained" onClick={() => {
 
-                <Button
-              
-                  variant="contained"
-                  onClick={handleNext}
-                  sx={{ mt: 3, ml: 1 }}
-                  type='submit'
+                  if (activeStep === steps.length - 1) {
+                    handleSubmit(handleSubmit); // Llama a la función para guardar los datos en la colección
+                    // Puedes añadir acciones adicionales aquí después de guardar los datos si es necesario
+                  }
+                  handleNext();
+                }
+                }
                 >
                   {activeStep === steps.length - 1 ? 'Guardar cotización' : 'Siguiente'}
                 </Button>
@@ -130,6 +182,6 @@ export default function Checkout() {
         </Paper>
         <Copyright />
       </Container>
-    </ThemeProvider>
+    </ThemeProvider >
   );
 }

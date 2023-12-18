@@ -11,6 +11,7 @@ import AluminioList from './components/AluminioList'
 import AluminioForm from './components/AluminioForm'
 import Cotization from './pages/Cotization'
 import Select from './components/Select'
+import ProformaLista from './components/ProformasLista'
 
 function App() {
   const { isAuthenticated } = useAuth0();
@@ -38,6 +39,7 @@ function App() {
           <Route path="/nuevo-aluminio" element={<AluminioForm />} />
           <Route path="/:id/editar-aluminio" element={<AluminioForm />} />
           <Route path='/select' element={<Select />}/>
+          <Route path="/proformas" element={<ProformaLista />} />
         </Routes>
       </BrowserRouter>
     </div>

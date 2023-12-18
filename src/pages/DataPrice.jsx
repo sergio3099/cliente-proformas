@@ -7,17 +7,10 @@ import {
     TextField
 } from '@mui/material';
 
-export default function AddressForm() {
-    const [datos, setDatos] = useState({
-        nombre: '',
-        apellido: '',
-        direccion: '',
-        referencia: '',
-        celular: ''
-    })
+export default function AddressForm({formData, setFormData}) {
+    
 
-    const handleChange = e => setDatos({ ...datos, [e.target.name]: e.target.value });
-
+    const handleChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
 
     return (
         <React.Fragment>
@@ -32,7 +25,7 @@ export default function AddressForm() {
                         onChange={handleChange}
                         name="nombre"
                         label="Nombre"
-                        value={datos.nombre}
+                        value={formData.nombre}
                         fullWidth
                         autoComplete="given-name"
                         variant="standard"
@@ -45,7 +38,7 @@ export default function AddressForm() {
                         onChange={handleChange}
                         name="apellido"
                         label="Apellido"
-                        value={datos.apellido}
+                        value={formData.apellido}
                         fullWidth
                         autoComplete="family-name"
                         variant="standard"
@@ -58,7 +51,7 @@ export default function AddressForm() {
                         onChange={handleChange}
                         name="direccion"
                         label="Dirección"
-                        value={datos.direccion}
+                        value={formData.direccion}
                         fullWidth
                         autoComplete="shipping address-line1"
                         variant="standard"
@@ -71,7 +64,7 @@ export default function AddressForm() {
                         onChange={handleChange}
                         name="referencia"
                         label="Referencia"
-                        value={datos.referencia}
+                        value={formData.referencia}
                         fullWidth
                         autoComplete="shipping address-line2"
                         variant="standard"
@@ -84,7 +77,7 @@ export default function AddressForm() {
                         onChange={handleChange}
                         name="celular"
                         label="Celular"
-                        value={datos.celular}
+                        value={formData.celular}
                         fullWidth
                         autoComplete="shipping address-line2"
                         variant="standard"
