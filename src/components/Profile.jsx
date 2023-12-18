@@ -18,7 +18,7 @@ const Profile = () => {
         setAnchorElUser(null);
     };
 
-   
+
 
     return (
         isAuthenticated && (
@@ -26,14 +26,18 @@ const Profile = () => {
                 {/* <Grid container  direction="row" justifyContent="center" alignItems="center" >
             <Typography>Hola {user.name}      </Typography>
             <Avatar alt={user.name} src={user.picture} sx={{width: 56, height: 56}}/>
-            </Grid> */}
+        </Grid> */}
 
 
                 <Box sx={{ flexGrow: 0 }}>
+
                     <Tooltip title="Open settings">
-                        <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                            <Avatar alt={user.name} src={user.picture} />
-                        </IconButton>
+                        <Grid container direction="row" justifyContent="center" alignItems="center"  >
+                            <Typography padding= "0 1rem" ><strong>Hola</strong> {user.name}      </Typography>
+                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                <Avatar alt={user.name} src={user.picture} />
+                            </IconButton>
+                        </Grid>
                     </Tooltip>
                     <Menu
                         sx={{ mt: '45px' }}
@@ -53,7 +57,7 @@ const Profile = () => {
                     >
 
                         <MenuItem onClick={handleCloseUserMenu}>
-                            <Typography onClick={() =>logout()} >Cerrar sesión</Typography>
+                            <Typography onClick={() => logout()} >Cerrar sesión</Typography>
 
                         </MenuItem>
 
