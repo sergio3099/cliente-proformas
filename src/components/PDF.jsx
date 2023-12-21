@@ -1,0 +1,1 @@
+import {Document,Text, Page} from '@react-pdf/renderer'

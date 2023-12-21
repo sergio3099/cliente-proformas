@@ -6,9 +6,10 @@ import {
     Grid,
     TextField
 } from '@mui/material';
+import {useAuth0} from '@auth0/auth0-react'
 
 export default function AddressForm({formData, setFormData}) {
-    
+    const {user} = useAuth0()
 
     const handleChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -78,6 +79,19 @@ export default function AddressForm({formData, setFormData}) {
                         name="celular"
                         label="Celular"
                         value={formData.celular}
+                        fullWidth
+                        autoComplete="shipping address-line2"
+                        variant="standard"
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        // id="address2"
+                        type='email'
+                        onChange={handleChange}
+                        name="email"
+                        label="Correo Electronico"
+                        value={user.email}
                         fullWidth
                         autoComplete="shipping address-line2"
                         variant="standard"

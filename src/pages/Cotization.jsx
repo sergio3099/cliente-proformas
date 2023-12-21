@@ -16,6 +16,7 @@ import PaymentForm from '../pages/PaymenForm';
 import Review from '../pages/Review';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom'
+import {useAuth0} from '@auth0/auth0-react'
 
 
 
@@ -38,6 +39,8 @@ const steps = ['Datos Cliente', 'Producto', 'Detalles Cotización'];
 const theme = createTheme();
 
 export default function Checkout() {
+
+  const {user, isAuthenticated} = useAuth0()
   const [activeStep, setActiveStep] = React.useState(0);
 
   const [formData, setFormData] = React.useState({
@@ -53,6 +56,7 @@ export default function Checkout() {
     alto: '',
     ancho: '',
     grosorVidrio: '',
+    email: user.email,
     // Otros campos si los hay
   });
 
