@@ -8,11 +8,14 @@ import {
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import InputAdornment from '@mui/material/InputAdornment'
+
 
 export default function VidrioForm() {
     const [vidiros, setVidrios] = useState({
         nombre: '',
-        descripcion: ''
+        descripcion: '',
+        valor: ''
     })
     const navigate = useNavigate();
     const handleChange = e => setVidrios({ ...vidiros, [e.target.name]: e.target.value });
@@ -26,6 +29,7 @@ export default function VidrioForm() {
         setVidrios({
             nombre: data.nombre,
             descripcion: data.descripcion,
+            valor: data.valor
 
         })
         setEditing(true)
@@ -113,6 +117,19 @@ export default function VidrioForm() {
                                 value={vidiros.descripcion}
                                 style={{ margin: '.5rem 0' }}
                                 fullWidth
+                            />
+                            <TextField
+                                type='Number'
+                                variant='filled'
+                                label='Valor por m2'
+                                onChange={handleChange}
+                                name='valor'
+                                value={vidiros.valor}
+                                style={{ margin: '.5rem 0' }}
+                                fullWidth
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                }}
                             />
                            
 

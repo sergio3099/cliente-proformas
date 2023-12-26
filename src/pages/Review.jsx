@@ -12,7 +12,7 @@ export default function Review({ formData }) {
         Detalles de Cotización
       </Typography>
       <Grid item xs={12}>
-        <Typography variant='h7' gutterBottom>{formData.selectedProducto ? formData.selectedProducto.label : ''}</Typography>
+        <Typography variant='h7' gutterBottom>{formData.producto ? formData.producto : ''}</Typography>
         <Typography variant='h6'>Materiales</Typography>
 
         
@@ -24,13 +24,13 @@ export default function Review({ formData }) {
             <Typography >Vidrio:</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography gutterBottom>{formData.selectedVidrio ? formData.selectedVidrio.label : ''}</Typography>
+            <Typography gutterBottom>{formData.vidrio ? formData.vidrio : ''}</Typography>
           </Grid>
           <Grid item xs={6}>
             <Typography gutterBottom>Aluminio:</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography gutterBottom>{formData.selectedAluminio ? formData.selectedAluminio.label : ''}</Typography>
+            <Typography gutterBottom>{formData.aluminio ? formData.aluminio : ''}</Typography>
           </Grid>
           <Grid item xs={6}>
             <Typography gutterBottom>Grosor del vidrio:</Typography>

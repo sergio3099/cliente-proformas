@@ -5,6 +5,8 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import AsyncSelect from 'react-select/async'
 import makeAnimated from 'react-select/animated'
+import InputAdornment from '@mui/material/InputAdornment'
+import { MenuItem } from '@mui/material';
 
 export default function PaymentForm({ formData, setFormData }) {
     const [productos, setProductos] = useState([])
@@ -12,6 +14,7 @@ export default function PaymentForm({ formData, setFormData }) {
     const [aluminios, setAluminios] = useState([])
     const animatedComponents = makeAnimated()
 
+ 
     const loadProductos = async (searchValue) => {
         const res = await fetch('https://backend-proformas.onrender.com/v1/softwareproformas/api/productos')
         const data = await res.json()
@@ -53,57 +56,56 @@ export default function PaymentForm({ formData, setFormData }) {
     }, [])
 
     const handleProductoChange = (selectedOption) => {
-        // Manejar el cambio en el campo de Producto y actualizar formData
-        setFormData({ ...formData, selectedProducto: selectedOption });
+        setFormData({ ...formData, producto: selectedOption.value });
     };
 
     const handleVidrioChange = (selectedOption) => {
-        // Manejar el cambio en el campo de Tipo de vidrio y actualizar formData
-        setFormData({ ...formData, selectedVidrio: selectedOption });
+        setFormData({ ...formData, vidrio: selectedOption.value });
     };
 
     const handleAluminioChange = (selectedOption) => {
-        // Manejar el cambio en el campo de Tipo de aluminio y actualizar formData
-        setFormData({ ...formData, selectedAluminio: selectedOption });
+        setFormData({ ...formData, aluminio: selectedOption.value });
     };
+
+
     const handleChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
     return (
         <React.Fragment>
-          
+
             <Grid container spacing={3} component="form">
                 <Grid item xs={12}  >
 
                     <Typography>Producto</Typography>
                     <AsyncSelect
-                        defaultValue
-                        placeholder ="seleccione un producto"
+                        placeholder="seleccione un producto"
                         loadOptions={loadProductos}
                         components={animatedComponents}
                         onChange={handleProductoChange}
-                        value={formData.selectedProducto}
+                        value={formData.producto ? { value: formData.producto, label: formData.producto } : null}
                     />
+                    {console.log(formData.producto.value)}
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <Typography>Tipo de vidrio</Typography>
                     <AsyncSelect
-                        defaultValue
-                        placeholder ="seleccione un vidrio"
+
+                        placeholder="seleccione un vidrio"
                         loadOptions={loadVidrios}
                         components={animatedComponents}
                         onChange={handleVidrioChange}
-                        value={formData.selectedVidrio}
+                        value={formData.vidrio ? { value: formData.vidrio, label: formData.vidrio } : null}
+
                     />
 
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <Typography>Tipo aluminio</Typography>
                     <AsyncSelect
-                        defaultValue
-                        placeholder ="seleccione un aluminio"
+                        placeholder="seleccione un aluminio"
                         loadOptions={loadAluminios}
                         components={animatedComponents}
                         onChange={handleAluminioChange}
-                        value={formData.selectedAluminio}
+                        value={formData.aluminio ? { value: formData.aluminio, label: formData.aluminio } : null}
                     />
 
                 </Grid>
@@ -118,6 +120,9 @@ export default function PaymentForm({ formData, setFormData }) {
                         autoComplete="shipping address-line2"
                         variant="standard"
                         onChange={handleChange}
+                        InputProps={{
+                            endAdornment: <InputAdornment position="end">cm</InputAdornment>,
+                        }}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -125,11 +130,13 @@ export default function PaymentForm({ formData, setFormData }) {
                         type='Number'
                         name='ancho'
                         label="Ingrese el ancho"
-                        fullWidth
                         autoComplete="shipping address-line2"
-                        variant="standard"
                         onChange={handleChange}
                         value={formData.ancho}
+                        variant="standard"
+                        InputProps={{
+                            endAdornment: <InputAdornment position="end">cm</InputAdornment>,
+                        }}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -137,18 +144,15 @@ export default function PaymentForm({ formData, setFormData }) {
                         type='Number'
                         name="grosorVidrio"
                         label="Ingrese el grosor del vidrio"
-                        fullWidth
                         autoComplete="shipping address-line2"
-                        variant="standard"
                         onChange={handleChange}
                         value={formData.grosorVidrio}
+                        variant="standard"
+                        InputProps={{
+                            endAdornment: <InputAdornment position="end">mm</InputAdornment>,
+                        }}
                     />
                 </Grid>
-
-
-
-
-
             </Grid>
         </React.Fragment>
     );

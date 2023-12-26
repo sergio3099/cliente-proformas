@@ -8,12 +8,15 @@ import {
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import InputAdornment from '@mui/material/InputAdornment'
+
 
 export default function AluminioForm() {
 
     const [aluminios, setAluminios] = useState({
         nombre: '',
-        descripcion: ''
+        descripcion: '',
+        valor: ''
     })
     const navigate = useNavigate();
     const handleChange = e => setAluminios({ ...aluminios, [e.target.name]: e.target.value });
@@ -27,6 +30,7 @@ export default function AluminioForm() {
         setAluminios({
             nombre: data.nombre,
             descripcion: data.descripcion,
+            valor: data.valor
 
         })
         setEditing(true)
@@ -113,6 +117,19 @@ export default function AluminioForm() {
                                 value={aluminios.descripcion}
                                 style={{ margin: '.5rem 0' }}
                                 fullWidth
+                            />
+                            <TextField
+                                type='Number'
+                                variant='filled'
+                                label='Valor'
+                                onChange={handleChange}
+                                name='valor'
+                                value={aluminios.valor}
+                                style={{ margin: '.5rem 0' }}
+                                fullWidth
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                }}
                             />
 
 

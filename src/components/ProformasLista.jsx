@@ -3,23 +3,33 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { Card, CardContent, Typography, Button, IconButton, Container } from '@mui/material';
-
+import { Card, CardContent, Typography, Button, IconButton, Container, Link } from '@mui/material';
+import { useAuth0 } from '@auth0/auth0-react'
 
 export default function ProformasLista() {
     const navigate = useNavigate()
     const [proformas, setProformas] = useState([])
+    const { user } = useAuth0()
 
     const loadProformas = async () => {
-        await axios.get('https://backend-proformas.onrender.com/v1/softwareproformas/api/proformas')
-            .then(res => {
-                setProformas(res.data.proformas)
-            })
-
-    }
+        if (user.nickname === 'admin-support') {
+            // Si el usuario es 'admin-support', carga todas las proformas sin filtrar
+            await axios.get(`https://backend-proformas.onrender.com/v1/softwareproformas/api/proformas/`)
+                .then(res => {
+                    setProformas(res.data.proformas);
+                });
+        } else {
+            // Si el usuario no es 'admin-support', filtra las proformas por su nickname
+            await axios.get(`https://backend-proformas.onrender.com/v1/softwareproformas/api/proformas/`)
+                .then(res => {
+                    const filteredProformas = res.data.proformas.filter(proforma => proforma.nickname === user.nickname);
+                    setProformas(filteredProformas);
+                });
+        }
+    };
     const handleDelete = async (_id) => {
         try {
-            await fetch(`https://backend-proformas.onrender.com/v1/softwareproformas/api/tipoaluminios/${_id}`, {
+            await fetch(`https://backend-proformas.onrender.com/v1/softwareproformas/api/proformas/${_id}`, {
                 method: "DELETE"
             })
             setProformas(proformas.filter((proforma) => proforma._id !== _id))
@@ -53,19 +63,17 @@ export default function ProformasLista() {
 
                             >
                                 <div>
-                                    <Typography>Nombre: {i.nombre}</Typography>
-                                    <Typography>Descripción: {i.producto}</Typography>
+                                    <Typography><strong>Nombre:</strong> {i.nombre}</Typography>
+                                    <Typography><strong>Descripción:</strong> {i.producto}</Typography>
+                                    <Typography><strong>Precio:</strong> ${i.precio}</Typography>
 
                                 </div>
                                 <div>
-
-                                    {/* <IconButton
-                                        variant='contained'
-                                        color='success'
-                                        onClick={() => navigate(`/${i._id}/editar-aluminio`)}
-                                    >
-                                        <EditIcon />
-                                    </IconButton> */}
+                                    <Button
+                                        component={Link}
+                                        sx={{ my: 2, color: 'black' }}
+                                        onClick={() => navigate(`/${i._id}/proforma`)}
+                                    >Ver detalles</Button>
 
                                     <IconButton
                                         variant='contained'

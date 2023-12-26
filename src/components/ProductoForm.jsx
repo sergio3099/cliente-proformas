@@ -8,11 +8,14 @@ import {
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import InputAdornment from '@mui/material/InputAdornment'
+
 
 export default function ProductoForm() {
     const [productos, setProductos] = useState({
         nombre: '',
-        descripcion: ''
+        descripcion: '',
+        valor: ''
     })
     const navigate = useNavigate();
     const handleChange = e => setProductos({ ...productos, [e.target.name]: e.target.value });
@@ -26,6 +29,7 @@ export default function ProductoForm() {
         setProductos({
             nombre: data.nombre,
             descripcion: data.descripcion,
+            valor: data.valor
 
         })
         setEditing(true)
@@ -114,6 +118,19 @@ export default function ProductoForm() {
                                 value={productos.descripcion}
                                 style={{ margin: '.5rem 0' }}
                                 fullWidth
+                            />
+                            <TextField
+                                type='Number'
+                                variant='filled'
+                                label='Valor de mano de obra'
+                                onChange={handleChange}
+                                name='valor'
+                                value={productos.valor}
+                                style={{ margin: '.5rem 0' }}
+                                fullWidth
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                }}
                             />
                            
 

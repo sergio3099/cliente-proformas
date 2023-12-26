@@ -35,7 +35,7 @@ const Profile = () => {
                         <Grid container direction="row" justifyContent="center" alignItems="center"  >
                             <Typography padding= "0 1rem" ><strong>Hola</strong> {user.name}      </Typography>
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar alt={user.name} src={user.picture} />
+                                <Avatar alt={user.nickname} src={user.picture} />
                             </IconButton>
                         </Grid>
                     </Tooltip>

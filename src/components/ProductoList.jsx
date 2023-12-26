@@ -62,8 +62,9 @@ const ProductoList = () => {
 
                             >
                                 <div>
-                                    <Typography>Nombre: {i.nombre}</Typography>
-                                    <Typography>Descripción: {i.descripcion}</Typography>
+                                    <Typography><strong>Nombre:</strong> {i.nombre}</Typography>
+                                    <Typography><strong>Descripción:</strong> {i.descripcion}</Typography>
+                                    <Typography><strong>Valor de mano de obra:</strong> $ {i.valor}</Typography>
                                     
                                 </div>
                                 <div>

@@ -63,7 +63,7 @@ function ResponsiveAppBar() {
           </Typography>
 
           {
-            isAdminSupport && (
+            isAdminSupport ? (
 
               <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
                 <IconButton
@@ -108,6 +108,50 @@ function ResponsiveAppBar() {
                   ))}
                 </Menu>
               </Box>
+            ):(
+              <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+                <IconButton
+                  size="large"
+                  aria-label="account of current user"
+                  aria-controls="menu-appbar"
+                  aria-haspopup="true"
+                  onClick={handleOpenNavMenu}
+                  color="inherit"
+                >
+                  <MenuIcon />
+                </IconButton>
+                <Menu
+                  id="menu-appbar"
+                  anchorEl={anchorElNav}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                  }}
+                  open={Boolean(anchorElNav)}
+                  onClose={handleCloseNavMenu}
+                  sx={{
+                    display: { xs: 'block', md: 'none' },
+                  }}
+                >
+                    <MenuItem  onClick={handleCloseNavMenu}>
+                      <Typography
+                        component={Link}
+                        to={`/proformas`} // Ruta correspondiente a cada página
+                        textAlign="center"
+                        sx={{ textDecoration: 'none', color: 'inherit' }}
+                      >
+                        Mis proformas
+                      </Typography>
+                    </MenuItem>
+                  
+                </Menu>
+              </Box>
+
             )
           }
           <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
@@ -147,8 +191,16 @@ function ResponsiveAppBar() {
                 </Button>
               ))
             ) : (
+              <Button
+            component={Link}
+            to="/proformas" // Ruta correspondiente a la página "Proformas"
+            onClick={handleCloseNavMenu}
+            sx={{ my: 2, color: 'white', display: 'block' }}
+          >
+           Mis Proformas
+          </Button>
               // Renderizar un espacio en blanco para mantener el perfil a la derecha
-              <div style={{ flexGrow: 1 }} />
+              // <div style={{ flexGrow: 1 }} />
             )}
           </Box>
           {

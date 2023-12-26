@@ -16,7 +16,9 @@ import PaymentForm from '../pages/PaymenForm';
 import Review from '../pages/Review';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom'
-import {useAuth0} from '@auth0/auth0-react'
+import { useAuth0 } from '@auth0/auth0-react'
+import BasicModal from '../components/BasicModal'
+// import LinearIndeterminate from '../components/LinearIndeterminate'
 
 
 
@@ -40,8 +42,11 @@ const theme = createTheme();
 
 export default function Checkout() {
 
-  const {user, isAuthenticated} = useAuth0()
+  const { user, isAuthenticated } = useAuth0()
   const [activeStep, setActiveStep] = React.useState(0);
+  const navigate = useNavigate();
+  const [loading, setLoading] = React.useState(false);
+  const [modalOpen, setModalOpen] = React.useState(false);
 
   const [formData, setFormData] = React.useState({
     // Aquí agrega todos los campos de los formularios
@@ -50,15 +55,36 @@ export default function Checkout() {
     direccion: '',
     referencia: '',
     celular: '',
-    selectedProduct: null,
-    selectedVidrio: null,
-    selectedAluminio: null,
+    producto: '',
+    vidrio: '',
+    aluminio: '',
     alto: '',
     ancho: '',
     grosorVidrio: '',
     email: user.email,
+    nickname: user.nickname,
+
     // Otros campos si los hay
   });
+  const resetFormData = () => {
+    setFormData({
+      nombre: '',
+      apellido: '',
+      direccion: '',
+      referencia: '',
+      celular: '',
+      producto: '',
+      vidrio: '',
+      aluminio: '',
+      alto: '',
+      ancho: '',
+      grosorVidrio: '',
+      email: user.email,
+      nickname: user.nickname,
+      
+    });
+  };
+
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -72,7 +98,13 @@ export default function Checkout() {
     switch (step) {
       case 0:
         return (
-          <AddressForm formData={formData} setFormData={setFormData} />
+          <AddressForm
+            formData={formData}
+            setFormData={setFormData}
+            setProducto={(selectedProducto) => setFormData({ ...formData, producto: selectedProducto })}
+            setVidrio={(selectedVidrio) => setFormData({ ...formData, vidrio: selectedVidrio })}
+            setAluminio={(selectedAluminio) => setFormData({ ...formData, aluminio: selectedAluminio })}
+          />
         );
       case 1:
         return (
@@ -80,24 +112,26 @@ export default function Checkout() {
         );
       case 2:
         return (
-          <Review formData={formData} />
+          <Review formData={formData} setFormData={setFormData} />
         );
       default:
         throw new Error('Unknown step');
     }
   };
 
-  const navigate = useNavigate();
-  const [loading, setLoading] = React.useState(false);
 
 
   const handleSubmit = async () => {
     try {
       setLoading(true);
+      setModalOpen(true)
+      const precio = parseInt(formData.alto) + 100;
+      setFormData({ ...formData, precio });
+
       const response = await fetch('https://backend-proformas.onrender.com/v1/softwareproformas/api/proformas', {
         method: 'POST',
         body: JSON.stringify(formData),
-        headers: {'Content-Type': 'application/json'}
+        headers: { 'Content-Type': 'application/json' }
       });
 
       if (response.ok) {
@@ -111,6 +145,7 @@ export default function Checkout() {
       alert('Ocurrió un error al procesar la solicitud');
     } finally {
       setLoading(false);
+      setModalOpen(false)
     }
   };
   return (
@@ -155,14 +190,17 @@ export default function Checkout() {
                 size='large'
                 sx={{ m: 1 }}
                 endIcon={<AddIcon fontSize='large' />}
-                onClick={() => window.location.reload(true)}
+                onClick={() => {
+                  resetFormData(); // Restablecer el estado del formulario
+                  setActiveStep(0); // Reiniciar al primer paso
+                }}
               >
                 Nueva Cotización
               </Button>
             </React.Fragment>
           ) : (
             <React.Fragment>
-              {getStepContent(activeStep)}
+              {getStepContent(activeStep, formData, setFormData)}
               <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                 {/* Botones para navegar entre los pasos */}
                 <Button disabled={activeStep === 0} onClick={handleBack}>
@@ -183,6 +221,8 @@ export default function Checkout() {
               </Box>
             </React.Fragment>
           )}
+          {/* {loading && <LinearIndeterminate />} */}
+          <BasicModal open={modalOpen} onClose={() => setModalOpen(false)} />
         </Paper>
         <Copyright />
       </Container>
