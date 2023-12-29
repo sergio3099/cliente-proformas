@@ -18,8 +18,6 @@ import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 import BasicModal from '../components/BasicModal'
-// import LinearIndeterminate from '../components/LinearIndeterminate'
-
 
 
 function Copyright() {
@@ -49,23 +47,28 @@ export default function Checkout() {
   const [modalOpen, setModalOpen] = React.useState(false);
 
   const [formData, setFormData] = React.useState({
-    // Aquí agrega todos los campos de los formularios
     nombre: '',
     apellido: '',
     direccion: '',
     referencia: '',
     celular: '',
+    precio: '',
+    email: user.email,
+    nickname: user.nickname,
+    productosProforma: [],
+  });
+
+  const [data, setData] = React.useState({
     producto: '',
     vidrio: '',
     aluminio: '',
     alto: '',
     ancho: '',
     grosorVidrio: '',
-    email: user.email,
-    nickname: user.nickname,
+    precio: ''
 
-    // Otros campos si los hay
-  });
+  })
+
   const resetFormData = () => {
     setFormData({
       nombre: '',
@@ -73,27 +76,27 @@ export default function Checkout() {
       direccion: '',
       referencia: '',
       celular: '',
-      producto: '',
-      vidrio: '',
-      aluminio: '',
-      alto: '',
-      ancho: '',
-      grosorVidrio: '',
+      precio: '',
       email: user.email,
       nickname: user.nickname,
-      
+      productosProforma: []
+
     });
   };
-
-
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
-
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
+  const [productosTemporales, setProductosTemporales] = React.useState([]);
+  const handleInputChange = (e) => {
+    setData({
+      ...data,
+      [e.target.name]: e.target.value,
+    });
+  };
   const getStepContent = (step) => {
     switch (step) {
       case 0:
@@ -101,18 +104,24 @@ export default function Checkout() {
           <AddressForm
             formData={formData}
             setFormData={setFormData}
-            setProducto={(selectedProducto) => setFormData({ ...formData, producto: selectedProducto })}
-            setVidrio={(selectedVidrio) => setFormData({ ...formData, vidrio: selectedVidrio })}
-            setAluminio={(selectedAluminio) => setFormData({ ...formData, aluminio: selectedAluminio })}
           />
         );
       case 1:
         return (
-          <PaymentForm formData={formData} setFormData={setFormData} />
+          <PaymentForm
+            formData={formData}
+            setFormData={setFormData}
+            data={data}
+            setData={setData}
+            handleInputChange={handleInputChange}
+            handleAgregarProducto={handleAgregarProducto}
+            productosTemporales={productosTemporales}
+            setProductosTemporales={setProductosTemporales}
+          />
         );
       case 2:
         return (
-          <Review formData={formData} setFormData={setFormData} />
+          <Review formData={formData} setData={setData} data={data}/>
         );
       default:
         throw new Error('Unknown step');
@@ -121,22 +130,81 @@ export default function Checkout() {
 
 
 
+  const handleAgregarProducto = () => {
+    const alto = parseFloat(data.alto);
+    const ancho = parseFloat(data.ancho);
+
+    if (!isNaN(alto) && !isNaN(ancho) && alto > 0 && ancho > 0) {
+      const precio = alto + ancho + 10;
+
+      const nuevoProducto = {
+        producto: data.producto.value,
+        vidrio: data.vidrio.value,
+        aluminio: data.aluminio.value,
+        alto: data.alto,
+        ancho: data.ancho,
+        grosorVidrio: data.grosorVidrio,
+        precio: precio.toFixed(2)
+      };
+
+      setProductosTemporales([...productosTemporales, nuevoProducto]);
+
+      setFormData({
+        ...formData,
+        productosProforma: [...formData.productosProforma, nuevoProducto],
+      });
+
+      setData({
+        producto: '',
+        vidrio: '',
+        aluminio: '',
+        alto: '',
+        ancho: '',
+        grosorVidrio: '',
+      });
+    } else {
+      alert('Por favor, ingrese valores válidos y mayores que cero para alto y ancho.');
+    }
+  };
+
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      setModalOpen(true)
-      const precio = parseInt(formData.alto) + 100;
-      setFormData({ ...formData, precio });
+      setModalOpen(true);
+
+      const arreglo = productosTemporales.map((productoTemp) => ({
+        producto: productoTemp.producto,
+        vidrio: productoTemp.vidrio,
+        aluminio: productoTemp.aluminio,
+        alto: productoTemp.alto,
+        ancho: productoTemp.ancho,
+        grosorVidrio: productoTemp.grosorVidrio,
+        precio: parseFloat(productoTemp.precio)
+      }));
+
+      const precioTotal = arreglo.reduce((total, producto) => total + producto.precio, 0);
 
       const response = await fetch('https://backend-proformas.onrender.com/v1/softwareproformas/api/proformas', {
         method: 'POST',
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          nombre: formData.nombre,
+          apellido: formData.apellido,
+          direccion: formData.direccion,
+          referencia: formData.referencia,
+          celular: formData.celular,
+          email: formData.email,
+          nickname: formData.nickname,
+          productosProforma: arreglo,
+          precio: precioTotal.toFixed(2)
+        }),
         headers: { 'Content-Type': 'application/json' }
       });
 
       if (response.ok) {
         alert('Se ha guardado con éxito');
         navigate('/home');
+        setProductosTemporales([])
+        resetFormData(  )
       } else {
         alert('Hubo un problema al guardar la cotización');
       }
@@ -145,9 +213,12 @@ export default function Checkout() {
       alert('Ocurrió un error al procesar la solicitud');
     } finally {
       setLoading(false);
-      setModalOpen(false)
+      setModalOpen(false);
     }
   };
+
+
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

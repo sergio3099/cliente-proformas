@@ -11,42 +11,75 @@ export default function ProformasLista() {
     const [proformas, setProformas] = useState([])
     const { user } = useAuth0()
 
-    const loadProformas = async () => {
-        if (user.nickname === 'admin-support') {
-            // Si el usuario es 'admin-support', carga todas las proformas sin filtrar
-            await axios.get(`https://backend-proformas.onrender.com/v1/softwareproformas/api/proformas/`)
-                .then(res => {
-                    setProformas(res.data.proformas);
-                });
-        } else {
-            // Si el usuario no es 'admin-support', filtra las proformas por su nickname
-            await axios.get(`https://backend-proformas.onrender.com/v1/softwareproformas/api/proformas/`)
-                .then(res => {
-                    const filteredProformas = res.data.proformas.filter(proforma => proforma.nickname === user.nickname);
-                    setProformas(filteredProformas);
-                });
+    const fetchProductName = async (_id) => {
+        try {
+            const res = await axios.get(
+                `https://backend-proformas.onrender.com/v1/softwareproformas/api/productos/${_id}`
+            );
+            return res.data.nombre;
+        } catch (error) {
+            console.error('Error fetching product name:', error);
+            return 'Nombre no disponible';
         }
     };
+
     const handleDelete = async (_id) => {
         try {
-            await fetch(`https://backend-proformas.onrender.com/v1/softwareproformas/api/proformas/${_id}`, {
-                method: "DELETE"
-            })
-            setProformas(proformas.filter((proforma) => proforma._id !== _id))
+            await axios.delete(
+                `https://backend-proformas.onrender.com/v1/softwareproformas/api/proformas/${_id}`
+            );
+            setProformas(proformas.filter((proforma) => proforma._id !== _id));
         } catch (error) {
             console.log(error);
         }
-    }
+    };
+
     useEffect(() => {
-        loadProformas()
-    }, [])
+        const loadProformas = async () => {
+            try {
+                let proformasData = [];
+                if (user.nickname === 'admin-support') {
+                    const res = await axios.get(
+                        'https://backend-proformas.onrender.com/v1/softwareproformas/api/proformas/'
+                    );
+                    proformasData = res.data.proformas;
+                } else {
+                    const res = await axios.get(
+                        'https://backend-proformas.onrender.com/v1/softwareproformas/api/proformas/'
+                    );
+                    proformasData = res.data.proformas.filter(
+                        (proforma) => proforma.nickname === user.nickname
+                    );
+                }
+
+                const updatedProformas = [];
+                for (const proforma of proformasData) {
+                    const updatedProducts = [];
+                    for (const productos of proforma.productosProforma) {
+                        const productName = await fetchProductName(productos[0].producto);
+                        updatedProducts.push({ ...productos[0], nombre: productName });
+                    }
+                    updatedProformas.push({
+                        ...proforma,
+                        productosProforma: updatedProducts,
+                    });
+                }
+                setProformas(updatedProformas);
+            } catch (error) {
+                console.error('Error loading proformas:', error);
+            }
+        };
+
+        loadProformas();
+    }, [user.nickname]);
+
     return (
         <Container>
             <h2>Proformas</h2>
             {
                 proformas.length > 0 ? (
-                    proformas.map(i => (
-                        <Card key={i._id}
+                    proformas.map((proforma) => (
+                        <Card key={proforma._id}
                             style={{
                                 background: "#90caf9",
 
@@ -63,22 +96,34 @@ export default function ProformasLista() {
 
                             >
                                 <div>
-                                    <Typography><strong>Nombre:</strong> {i.nombre}</Typography>
-                                    <Typography><strong>Descripción:</strong> {i.producto}</Typography>
-                                    <Typography><strong>Precio:</strong> ${i.precio}</Typography>
+                                    <Typography>
+                                        <strong>Nombre:</strong> {proforma.nombre}
+                                    </Typography>
+                                    <Typography>
+                                        <strong>Precio:</strong> ${proforma.precio}
+                                    </Typography>
+                                    <Typography>
+                                        <strong>Productos:</strong>{' '}
+                                        {proforma.productosProforma.map((productos, index) => (
+                                            <span key={index}>
+                                                {index > 0 && ', '}
+                                                {productos.nombre}
+                                            </span>
+                                        ))}
+                                    </Typography>
 
                                 </div>
                                 <div>
                                     <Button
                                         component={Link}
                                         sx={{ my: 2, color: 'black' }}
-                                        onClick={() => navigate(`/${i._id}/proforma`)}
+                                        onClick={() => navigate(`/${proforma._id}/proforma`)}
                                     >Ver detalles</Button>
 
                                     <IconButton
                                         variant='contained'
                                         color='error'
-                                        onClick={() => handleDelete(i._id)}
+                                        onClick={() => handleDelete(proforma._id)}
                                     >
                                         <DeleteIcon />
                                     </IconButton>

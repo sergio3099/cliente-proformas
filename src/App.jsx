@@ -13,6 +13,7 @@ import Cotization from './pages/Cotization'
 import Select from './components/Select'
 import ProformaLista from './components/ProformasLista'
 import ProformaDetalle from './components/ProformaDetalle'
+import ProformaForm from './components/ProformaForm'
 
 function App() {
   const { isAuthenticated } = useAuth0();
